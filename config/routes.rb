@@ -5,21 +5,24 @@ Rails.application.routes.draw do
     namespace :v1 do
       # Define your routes here for version 1
 
-      # Routes without middleware
+      # University routes
       resources :universities, only: [:index]
 
-      # Routes with middleware
+      # User routes
+      resources :users
 
-      resources :stories do
+      # Meet routes
+      resources :meets, only: [:index]
+
+      # Story routes
+      resources :stories, except: [:update] do
         member do
           put :toggle_favourite
         end
       end
-
-      resources :users
-      resources :meets, only: [:index]
       
-      resources :conversations do
+      # Conversations routes
+      resources :conversations, only: [:index, :create] do
         resources :messages, only: [:create]
       end
       
