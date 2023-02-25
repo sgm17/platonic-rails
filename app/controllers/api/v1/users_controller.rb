@@ -4,12 +4,13 @@ class Api::V1::UsersController < ApplicationController
     # GET /users
     def index
         render json: @user.as_json(
-            except: [:id, :sex, :age, :cloud_token, :university_id, :faculty_id, :study_id, :university_to_meet_id, :created_at, :updated_at],
+            except: [:university_id, :faculty_id, :study_id, :university_to_meet_id, :created_at, :updated_at],
             include: {
-              university: { only: [:name, :simple_name] },
-              study: { only: [:name, :courses] },
-              university_to_meet: { only: [:name] },
-              faculties_to_meet: { only: [:name], include: { studies: { only: [:name, :courses] } } }
+              university: { only: [:id, :name, :simple_name] },
+              faculty: { only: [:id, :faculty_name] },
+              study: { only: [:id, :name, :courses] },
+              university_to_meet: { only: [:id, :name] },
+              faculties_to_meet: { only: [:id, :name], include: { studies: { only: [:id, :name, :courses] } } }
             }
         )
     end
@@ -18,10 +19,10 @@ class Api::V1::UsersController < ApplicationController
     def show
         user = User.find_by(uid: params[:id])
         render json: user.as_json(
-            except: [:id, :sex, :age, :cloud_token, :faculty, :university_id, :faculty_id, :study_id, :meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
+            except: [:university_id, :faculty_id, :study_id, :meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
             include: {
-              university: { only: [:name, :simple_name] },
-              study: { only: [:name, :courses] }
+              university: { only: [:id, :name, :simple_name] },
+              study: { only: [:id, :name, :courses] }
             }
         )
     end

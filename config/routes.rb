@@ -11,7 +11,9 @@ Rails.application.routes.draw do
       # Routes with middleware
 
       resources :stories do
-        post :favourite, on: :member
+        member do
+          put :toggle_favourite
+        end
       end
 
       resources :users

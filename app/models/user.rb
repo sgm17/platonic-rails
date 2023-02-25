@@ -14,4 +14,11 @@ class User < ApplicationRecord
 
     # favourites that the user set to the stories
     has_many :favourites
+
+    # users has many stories
+    has_many :stories
+
+    # user has many conversations
+    has_many :initiated_conversations, class_name: "Conversation", foreign_key: "user1_id"
+    has_many :received_conversations, class_name: "Conversation", foreign_key: "user2_id"
 end
