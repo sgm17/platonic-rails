@@ -10,7 +10,7 @@ class Api::V1::UsersController < ApplicationController
               faculty: { only: [:id, :faculty_name] },
               study: { only: [:id, :name, :courses] },
               university_to_meet: { only: [:id, :name] },
-              faculties_to_meet: { only: [:id, :name], include: { studies: { only: [:id, :name, :courses] } } }
+              faculties_to_meet: { only: [:id, :faculty_name], include: { studies: { only: [:id, :name, :courses] } } }
             }
         )
     end
