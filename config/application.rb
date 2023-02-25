@@ -25,7 +25,7 @@ module Platonic
     # Middleware like session, flash, cookies can be added back manually.
 
     # FirebaseAuthenticator middleware
-    config.middleware.insert_before 0, FirebaseAuthenticator 
+    # config.middleware.insert_before 0, FirebaseAuthenticator 
 
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true

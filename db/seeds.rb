@@ -5,7 +5,7 @@ require 'json'
 
 # Load universities from JSON file
 universities_file = Rails.root.join('app', 'assets', 'universities', 'universities.json')
-universities_data = JSON.parse(File.read(universities_file))
+universities_data = JSON.parse(File.read(universities_file), encoding: 'utf-8')
 
 # Create universities, faculties, and studies
 universities_data.each do |university_data|

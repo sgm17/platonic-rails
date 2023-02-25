@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_24_130155) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_25_153741) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -31,11 +31,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_24_130155) do
     t.index ["university_id"], name: "index_faculties_on_university_id"
   end
 
-  create_table "faculties_to_meet", id: false, force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "faculty_id", null: false
-    t.index ["faculty_id", "user_id"], name: "index_faculties_to_meet_on_faculty_id_and_user_id"
-    t.index ["user_id", "faculty_id"], name: "index_faculties_to_meet_on_user_id_and_faculty_id"
+  create_table "faculties_users", id: false, force: :cascade do |t|
+    t.bigint "faculty_id"
+    t.bigint "user_id"
+    t.index ["faculty_id", "user_id"], name: "index_faculties_users_on_faculty_id_and_user_id", unique: true
+    t.index ["faculty_id"], name: "index_faculties_users_on_faculty_id"
+    t.index ["user_id"], name: "index_faculties_users_on_user_id"
   end
 
   create_table "favourites", force: :cascade do |t|
@@ -107,11 +108,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_24_130155) do
     t.bigint "study_id", null: false
     t.boolean "meet_status", null: false
     t.integer "sex_to_meet", null: false
+    t.bigint "university_to_meet_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["faculty_id"], name: "index_users_on_faculty_id"
     t.index ["study_id"], name: "index_users_on_study_id"
     t.index ["university_id"], name: "index_users_on_university_id"
+    t.index ["university_to_meet_id"], name: "index_users_on_university_to_meet_id"
   end
 
   add_foreign_key "conversations", "users", column: "user1_id"
@@ -129,4 +132,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_24_130155) do
   add_foreign_key "users", "faculties"
   add_foreign_key "users", "studies"
   add_foreign_key "users", "universities"
+  add_foreign_key "users", "universities", column: "university_to_meet_id"
 end

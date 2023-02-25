@@ -14,7 +14,7 @@ Rails.application.routes.draw do
         post :favourite, on: :member
       end
 
-      resources :users, only: [:index, :show, :update, :destroy]
+      resources :users
       resources :meets, only: [:index]
       
       resources :conversations do

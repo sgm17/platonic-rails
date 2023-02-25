@@ -1,10 +1,9 @@
 class Api::V1::StoriesController < ApplicationController
-    before_action :authenticate_user!, except: [:index, :show]
-    before_action :set_story, only: [:show, :update, :destroy, :toggle_favourite]
+    before_action :current_user, except: [:show]
   
     # GET /api/v1/stories
     def index
-        stories = current_user.university.stories.includes(:user, :faculty).map do |story|
+        stories = @user.university.stories.includes(:user, :faculty).map do |story|
             {
               app_user: story.user,
               faculty: story.faculty,
@@ -60,15 +59,11 @@ class Api::V1::StoriesController < ApplicationController
     end
   
     private
-  
-    # Use callbacks to share common setup or constraints between actions.
-    def set_story
-      @story = Story.find(params[:id])
-    end
-  
+
     # Only allow a list of trusted parameters through.
     def story_params
       params.require(:story).permit(:user_id, :faculty_id, :body, :background_gradient)
     end
   end
+end
   
