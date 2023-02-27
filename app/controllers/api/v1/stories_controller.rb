@@ -5,23 +5,44 @@ class Api::V1::StoriesController < ApplicationController
     def index
       stories = []
       @user.university.faculties.each do |faculty|
-        stories.concat(faculty.stories)
+      stories << faculty.stories.last.as_json(
+            except: [:user_id, :favourites, :faculty_id, :background_gradient_index, :body, :created_at, :updated_at],
+            include: {
+              faculty: { only: [:id, :faculty_name] },
+              user: {
+                except: [:university_id, :faculty_id, :study_id, :meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
+                include: {
+                  university: { only: [:id, :name, :simple_name] },
+                  faculty: { only: [:id, :faculty_name] },
+                  study: { only: [:id, :name, :courses] },
+                }
+              }
+            }
+          )
       end
-      render json: stories
+      render json: stories.compact
     end
-  
+    
+      
     # GET /api/v1/stories/faculty_id
     def show
       faculty = Faculty.find(params[:id])
 
-      stories = []
+      stories = faculty.stories.includes(user: [:university, :faculty]).map do |story|
+        user = story.user.as_json(
+          except: [:university_id, :faculty_id, :study_id, :meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
+          include: {
+            university: { only: [:id, :name, :simple_name] },
+            faculty: { only: [:id, :faculty_name] },
+            study: { only: [:id, :name, :courses] }
+          })
 
-      faculty.stories.includes(:user, :faculty).map do |story|
-        stories << {
-          app_user: story.user,
-          faculty: story.faculty,
+        {
+          id: story.id,
+          user: user,
+          faculty: faculty,
           body: story.body,
-          background_gradient: story.background_gradient,
+          background_gradient_index: story.background_gradient_index,
           created_at: story.created_at,
           favourite: story.favourites.exists?(user_id: current_user.id),
           already_conversation: current_user.initiated_conversations.exists?(user2_id: story.user.id) || current_user.received_conversations.exists?(user1_id: story.user.id),
@@ -38,7 +59,11 @@ class Api::V1::StoriesController < ApplicationController
       @story.faculty = current_user.faculty
 
       if @story.save
-        render json: @story, status: :created
+        json = @story.as_json(include: [:user, :faculty], except: [:updated_at, :user_id, :faculty_id, :favourites])
+        json['favourite'] = false
+        json['own_story'] = true
+        json['already_conversation'] = false
+        render json: json, status: :created
       else
         render json: @story.errors, status: :unprocessable_entity
       end
@@ -73,9 +98,9 @@ class Api::V1::StoriesController < ApplicationController
   
     private
 
-    # Only allow a list of trusted parameters through.
     def create_story_params
-      params.require(:story).permit(:faculty, :body, :background_gradient)
+    # Only allow a list of trusted parameters through.
+      params.require(:story).permit(:body, :background_gradient_index)
     end
 end
   

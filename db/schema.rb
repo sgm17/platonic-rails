@@ -71,7 +71,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_25_153741) do
     t.bigint "user_id", null: false
     t.bigint "faculty_id", null: false
     t.string "body", null: false
-    t.string "background_gradient", null: false
+    t.integer "background_gradient_index", null: false
     t.boolean "favourites", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

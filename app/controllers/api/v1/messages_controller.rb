@@ -3,7 +3,7 @@ class Api::V1::MessagesController < ApplicationController
   
     # POST /conversations/1/messages
     def create
-      conversation = current_user.initiated_conversations.find_by(id: params[:conversation_id]) || current_user.received_conversations.find_by(id: params[:conversation_id])
+      conversation = current_user.conversations.find_by(id: params[:conversation_id])
       @message = conversation.messages.build(message: params[:message], user: current_user)
   
       if @message.save

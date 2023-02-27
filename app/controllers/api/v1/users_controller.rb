@@ -3,28 +3,13 @@ class Api::V1::UsersController < ApplicationController
 
     # GET /users
     def index
-        render json: @user.as_json(
-            except: [:university_id, :faculty_id, :study_id, :university_to_meet_id, :created_at, :updated_at],
-            include: {
-              university: { only: [:id, :name, :simple_name] },
-              faculty: { only: [:id, :faculty_name] },
-              study: { only: [:id, :name, :courses] },
-              university_to_meet: { only: [:id, :name] },
-              faculties_to_meet: { only: [:id, :faculty_name], include: { studies: { only: [:id, :name, :courses] } } }
-            }
-        )
+        render json: @user.app_user
     end
 
     # GET /users/hR1NbH4yhsMZJ9aZJuzqErzBwPJ3
     def show
         user = User.find_by(uid: params[:id])
-        render json: user.as_json(
-            except: [:university_id, :faculty_id, :study_id, :meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
-            include: {
-              university: { only: [:id, :name, :simple_name] },
-              study: { only: [:id, :name, :courses] }
-            }
-        )
+        render json: user.other_app_user
     end
 
     # POST /users
@@ -61,7 +46,16 @@ class Api::V1::UsersController < ApplicationController
         end
 
         if @user.save
-            render json: @user.as_json(except: [:created_at, :updated_at]), status: :created
+            render json: @user.as_json(
+              except: [:university_id, :faculty_id, :study_id, :university_to_meet_id, :created_at, :updated_at],
+              include: {
+                university: { only: [:id, :name, :simple_name] },
+                faculty: { only: [:id, :faculty_name] },
+                study: { only: [:id, :name, :courses] },
+                university_to_meet: { only: [:id, :name] },
+                faculties_to_meet: { only: [:id, :faculty_name], include: { studies: { only: [:id, :name, :courses] } } }
+              }),
+            status: :created
         else
             render json: @user.errors, status: :unprocessable_entity
         end

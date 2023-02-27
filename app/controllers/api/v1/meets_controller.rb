@@ -3,11 +3,19 @@ class Api::V1::MeetsController < ApplicationController
   
     # GET /api/v1/meets
     def index
-      create_meetings()
-      #meets = current_user.meets.includes(:user)
-  #
-      #render json: meets.map { |meet| meet.user }
+      # Retrieve all meets that involve the current user
+      meets = current_user.meets.includes(:user1, :user2)
+    
+      meets = meets.map do |meet|
+        meet = {
+          id: meet.id,
+          user: meet.user1 == current_user ? meet.user2.other_app_user : meet.user1.other_app_user
+        }
+      end      
+
+      render json: meets
     end
+    
   
     # GET /api/v1/meets/1
     # def show
@@ -51,6 +59,9 @@ class Api::V1::MeetsController < ApplicationController
       def match_users(user, users_to_match)
         # Sort users_to_match by faculty, to prioritize matches on the same faculty
         users_to_match = users_to_match.order(faculty_id: :desc)
+
+        # Exclude users that have already been matched
+        users_to_match = users_to_match.where.not(id: user.meets.pluck(:user2_id))
 
         # Check if any user in users_to_match matches all preferences
         perfect_matches = users_to_match.where(

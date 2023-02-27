@@ -3,25 +3,31 @@ class Api::V1::ConversationsController < ApplicationController
   
     # GET /conversations
     def index
-      initiated_conversations = current_user.initiated_conversations.includes(:messages, :user).map do |conversation|
+      conversations = current_user.conversations.includes(:messages, :user1, :user2).map do |conversation|
+        other_user = conversation.user1_id == current_user.id ? conversation.user2 : conversation.user1
+        last_message = conversation.messages.last
         {
           id: conversation.id,
-          user: conversation.user,
-          messages: conversation.messages
+          user: other_user.other_app_user,
+          messages: [last_message.as_json(
+            except: [:conversation_id, :updated_at]
+          )]
         }
+      end
+      render json: conversations
+    end
+
+    # GET /conversations/conversation_id
+    def show
+      messages = Conversation.find(params[:id]).messages.map do |message|
+        message.as_json(
+          except: [:conversation_id, :updated_at]
+        )
       end
 
-      received_conversations = current_user.received_conversations.includes(:messages, :user).map do |conversation|
-        {
-          id: conversation.id,
-          user: conversation.user,
-          messages: conversation.messages
-        }
-      end
-  
-      render json: initiated_conversations.concat(received_conversations).sort_by { |hash| hash[:id] }
+      render json: messages
     end
-  
+
     # POST /conversations
     def create
       conversation = current_user.initiated_conversations.build(user1_id: current_user.id, user2_id: params[:user_id])
