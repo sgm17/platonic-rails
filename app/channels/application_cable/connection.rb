@@ -3,10 +3,11 @@ module ApplicationCable
     identified_by :current_user
 
     def connect
-      self.current_user = find_verified_user
+      self.current_user = authenticate_user
     end
 
-    def find_verified_user
+    def authenticate_user
+      current_user = User.find_by(uid: 'hR1NbH4yhsMZJ9aZJuzqErzBwPJ3')
       if current_user
         current_user
       else

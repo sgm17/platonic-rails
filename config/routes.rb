@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  mount ActionCable.server => '/cable'
 
   namespace :api do
     namespace :v1 do
@@ -22,7 +23,7 @@ Rails.application.routes.draw do
       end
       
       # Conversations routes
-      resources :conversations, only: [:index, :show, :create] do
+      resources :conversations, only: [:index, :create] do
         resources :messages, only: [:create]
       end
       

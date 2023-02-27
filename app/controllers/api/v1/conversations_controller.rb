@@ -1,15 +1,11 @@
 class Api::V1::ConversationsController < ApplicationController
-    before_action :current_user, except: [:show]
+    before_action :current_user
   
     # GET /conversations
     def index
       conversations = current_user.conversations.includes(:messages, :user1, :user2).map do |conversation|
         other_user = conversation.user1_id == current_user.id ? conversation.user2 : conversation.user1
         last_message = conversation.messages.last
-
-        messages = !last_message.nil? ? [last_message.as_json(
-          except: [:updated_at])] : []
-
         {
           id: conversation.id,
           user: other_user.as_json(
@@ -20,22 +16,23 @@ class Api::V1::ConversationsController < ApplicationController
               study: { only: [:id, :name, :courses] }
             }
           ),
-          messages: messages
+          messages: conversation.messages.as_json(
+            except: [:updated_at])
         }
       end
       render json: conversations
     end
 
     # GET /conversations/conversation_id
-    def show
-      messages = Conversation.find(params[:id]).messages.map do |message|
-        message.as_json(
-          except: [:conversation_id, :updated_at]
-        )
-      end
-
-      render json: messages.reverse
-    end
+    # def show
+    #   messages = Conversation.find(params[:id]).messages.map do |message|
+    #     message.as_json(
+    #       except: [:conversation_id, :updated_at]
+    #     )
+    #   end
+    #
+    #   render json: messages
+    # end
 
     # POST /conversations
     def create
