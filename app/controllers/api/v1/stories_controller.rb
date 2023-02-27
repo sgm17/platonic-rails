@@ -4,13 +4,15 @@ class Api::V1::StoriesController < ApplicationController
     # GET /api/v1/stories
     def index
       stories = []
-      @user.university.faculties.each do |faculty|
-      stories << faculty.stories.last.as_json(
+      @current_user.university.faculties.each do |faculty|
+        latest_story = faculty.stories.last
+        next if latest_story.nil?
+          stories << latest_story.as_json(
             except: [:user_id, :favourites, :faculty_id, :background_gradient_index, :body, :created_at, :updated_at],
             include: {
               faculty: { only: [:id, :faculty_name] },
               user: {
-                except: [:university_id, :faculty_id, :study_id, :meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
+                except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
                 include: {
                   university: { only: [:id, :name, :simple_name] },
                   faculty: { only: [:id, :faculty_name] },
@@ -20,7 +22,7 @@ class Api::V1::StoriesController < ApplicationController
             }
           )
       end
-      render json: stories.compact
+      render json: stories
     end
     
       
@@ -30,7 +32,7 @@ class Api::V1::StoriesController < ApplicationController
 
       stories = faculty.stories.includes(user: [:university, :faculty]).map do |story|
         user = story.user.as_json(
-          except: [:university_id, :faculty_id, :study_id, :meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
+          except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
           include: {
             university: { only: [:id, :name, :simple_name] },
             faculty: { only: [:id, :faculty_name] },
@@ -40,7 +42,7 @@ class Api::V1::StoriesController < ApplicationController
         {
           id: story.id,
           user: user,
-          faculty: faculty,
+          faculty: faculty.as_json(only: [:id, :faculty_name]),
           body: story.body,
           background_gradient_index: story.background_gradient_index,
           created_at: story.created_at,
@@ -55,11 +57,25 @@ class Api::V1::StoriesController < ApplicationController
     # POST /api/v1/stories
     def create
       @story = Story.new(create_story_params)
-      @story.user = current_user
       @story.faculty = current_user.faculty
+      @story.user = current_user
 
       if @story.save
-        json = @story.as_json(include: [:user, :faculty], except: [:updated_at, :user_id, :faculty_id, :favourites])
+        json = @story.as_json(
+          include: {
+            user: {
+              except: [:created_at, :updated_at],
+              include: {
+                university: { only: [:id, :name, :simple_name] },
+                faculty: { only: [:id, :faculty_name] },
+                study: { only: [:id, :name, :courses] }
+              }
+            },
+            faculty: {
+              except: [:updated_at, :favourites]
+            }
+          }
+        )
         json['favourite'] = false
         json['own_story'] = true
         json['already_conversation'] = false
@@ -79,20 +95,20 @@ class Api::V1::StoriesController < ApplicationController
     # end
   
     # DELETE /api/v1/stories/1
-    def destroy
-      @story.destroy
-    end
+    # def destroy
+    #   @story.destroy
+    # end
   
-    # POST /api/v1/stories/1/toggle_favourite
+    # PUT /api/v1/stories/1/toggle_favourite
     def toggle_favourite
       @story = Story.find(params[:id])
       favourite = @story.favourites.find_by(user_id: current_user.id)
       if favourite
         favourite.destroy
-        render json: { message: 'Favourite removed' }
+        render json: { favourite: @story.favourites.exists?(user_id: current_user.id) }
       else
         @story.favourites.create(user_id: current_user.id)
-        render json: { message: 'Favourited!' }
+        render json: { favourite: @story.favourites.exists?(user_id: current_user.id) }
       end
     end
   

@@ -7,9 +7,16 @@ class Api::V1::MeetsController < ApplicationController
       meets = current_user.meets.includes(:user1, :user2)
     
       meets = meets.map do |meet|
+        user = meet.user1 == current_user ? meet.user2 : meet.user1
         meet = {
           id: meet.id,
-          user: meet.user1 == current_user ? meet.user2.other_app_user : meet.user1.other_app_user
+          user: user.as_json(
+            except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
+            include: {
+              university: { only: [:id, :name, :simple_name] },
+              faculty: { only: [:id, :faculty_name] },
+              study: { only: [:id, :name, :courses] }
+            })
         }
       end      
 

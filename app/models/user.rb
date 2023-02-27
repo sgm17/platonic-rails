@@ -34,27 +34,4 @@ class User < ApplicationRecord
     def conversations
         Conversation.where("user1_id = ? OR user2_id = ?", id, id)
     end
-
-    def app_user
-        self.as_json(
-            except: [:university_id, :faculty_id, :study_id, :university_to_meet_id, :created_at, :updated_at],
-            include: {
-              university: { only: [:id, :name, :simple_name] },
-              faculty: { only: [:id, :faculty_name] },
-              study: { only: [:id, :name, :courses] },
-              university_to_meet: { only: [:id, :name, :simple_name] },
-              faculties_to_meet: { only: [:id, :faculty_name], include: { studies: { only: [:id, :name, :courses] } } }
-            }
-        )
-    end
-
-    def other_app_user
-        self.as_json(
-            except: [:university_id, :faculty_id, :study_id, :meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
-            include: {
-              university: { only: [:id, :name, :simple_name] },
-              faculty: { only: [:id, :faculty_name] },
-              study: { only: [:id, :name, :courses] }
-            })
-    end
 end

@@ -9,7 +9,7 @@ Rails.application.routes.draw do
       resources :universities, only: [:index]
 
       # User routes
-      resources :users
+      resources :users, except: [:destroy]
 
       # Meet routes
       resources :meets, only: [:index]
