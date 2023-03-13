@@ -15,8 +15,14 @@ class User < ApplicationRecord
     # favourites that the user set to the stories
     has_many :favourites
 
+    # bookmarks that the user set to the flats
+    has_many :bookmarks
+
     # users has many stories
     has_many :stories
+
+    # users has many stories
+    has_many :flats
 
     # user has many meets
     has_many :meets_as_user1, class_name: "Meet", foreign_key: "user1_id"

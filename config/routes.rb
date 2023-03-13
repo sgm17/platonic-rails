@@ -21,6 +21,15 @@ Rails.application.routes.draw do
           put :toggle_favourite
         end
       end
+
+      # Flats routes
+      resources :flats do
+        collection do
+          get :index_home
+        end
+        post :bookmark, on: :member
+        post :add_remove_tenant
+      end
       
       # Conversations routes
       resources :conversations, only: [:index, :create] do

@@ -15,7 +15,7 @@ class Api::V1::MeetsController < ApplicationController
             include: {
               university: { only: [:id, :name, :simple_name] },
               faculty: { only: [:id, :faculty_name] },
-              study: { only: [:id, :name, :courses] }
+              study: { only: [:id, :name] }
             })
         }
       end      

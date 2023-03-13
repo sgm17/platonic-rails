@@ -11,19 +11,18 @@ universities_data = JSON.parse(File.read(universities_file), encoding: 'utf-8')
 universities_data.each do |university_data|
   university = University.create!(
     name: university_data['name'],
-    simple_name: university_data['simpleName']
+    simple_name: university_data['simple_name']
   )
 
   university_data['faculties'].each do |faculty_data|
     faculty = Faculty.create!(
-      faculty_name: faculty_data['facultyName'],
+      faculty_name: faculty_data['faculty_name'],
       university: university
     )
 
     faculty_data['studies'].each do |study_data|
       Study.create!(
-        name: study_data["name"],
-        courses: study_data['courses'],
+        study_name: study_data["study_name"],
         faculty: faculty
       )
     end

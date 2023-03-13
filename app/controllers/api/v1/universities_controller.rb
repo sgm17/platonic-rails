@@ -15,8 +15,7 @@ class Api::V1::UniversitiesController < ApplicationController
                   studies: faculty.studies.map do |study|
                     {
                       id: study.id,
-                      name: study.name,
-                      courses: study.courses
+                      study_name: study.study_name,
                     }
                   end
                 }
