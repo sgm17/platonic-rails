@@ -4,57 +4,31 @@ class Api::V1::MeetsController < ApplicationController
     # GET /api/v1/meets
     def index
       # Retrieve all meets that involve the current user
-      meets = current_user.meets.includes(:user1, :user2)
+      meets = @current_user.meets.includes(:user1, :user2)
     
       meets = meets.map do |meet|
-        user = meet.user1 == current_user ? meet.user2 : meet.user1
+        user = meet.user1 == @current_user ? meet.user2 : meet.user1
         meet = {
           id: meet.id,
           user: user.as_json(
-            except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
-            include: {
-              university: { only: [:id, :name, :simple_name] },
-              faculty: { only: [:id, :faculty_name] },
-              study: { only: [:id, :name] }
-            })
+            except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at]
+          )
         }
-      end      
-
+      end
       render json: meets
     end
-    
-  
-    # GET /api/v1/meets/1
-    # def show
-    #  render json: @meet
-    # end
-  
-    # POST /api/v1/meets
-    # def create
-    #   @meet = Meet.new(meet_params)
-    #   @meet.user = current_user
-    #
-    #   if @meet.save
-    #     render json: @meet, status: :created, location: api_v1_meet_url(@meet)
-    #   else
-    #     render json: @meet.errors, status: :unprocessable_entity
-    #   end
-    # end
-  
-    # PATCH/PUT /api/v1/meets/1
-    # def update
-    #   if @meet.update(meet_params)
-    #     render json: @meet
-    #   else
-    #     render json: @meet.errors, status: :unprocessable_entity
-    #   end
-    # end
-  
-    # DELETE /api/v1/meets/1
-    # def destroy
-    #   @meet.destroy
-    # end
-  
+
+    # DELETE /api/v1/meets/:meet_id
+    def destroy
+      meet = Meet.find(params[:id])
+
+      if meet.destroy
+        render json: { destroyed: true }
+      else
+        render json: { destroyed: false }
+      end
+    end
+
     def create_meetings
       users = User.where(meet_status: true)
 

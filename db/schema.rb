@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_09_161658) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_13_225041) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -83,36 +83,40 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_09_161658) do
     t.integer "floor", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "list_of_images", default: [], array: true
+    t.text "images", default: [], array: true
     t.index ["owner_id"], name: "index_flats_on_owner_id"
   end
 
   create_table "flats_features", id: false, force: :cascade do |t|
-    t.bigint "flat_id", null: false
-    t.bigint "feature_id", null: false
+    t.bigint "flat_id"
+    t.bigint "feature_id"
     t.index ["feature_id"], name: "index_flats_features_on_feature_id"
+    t.index ["flat_id", "feature_id"], name: "index_flats_features_on_flat_id_and_feature_id", unique: true
     t.index ["flat_id"], name: "index_flats_features_on_flat_id"
   end
 
   create_table "flats_tenants", id: false, force: :cascade do |t|
-    t.bigint "flat_id", null: false
-    t.bigint "user_id", null: false
+    t.bigint "flat_id"
+    t.bigint "user_id"
+    t.index ["flat_id", "user_id"], name: "index_flats_tenants_on_flat_id_and_user_id", unique: true
     t.index ["flat_id"], name: "index_flats_tenants_on_flat_id"
     t.index ["user_id"], name: "index_flats_tenants_on_user_id"
   end
 
-  create_table "flats_tenants_universities", force: :cascade do |t|
-    t.bigint "flat_id"
-    t.bigint "university_id"
-    t.index ["flat_id"], name: "index_flats_tenants_universities_on_flat_id"
-    t.index ["university_id"], name: "index_flats_tenants_universities_on_university_id"
-  end
-
   create_table "flats_transports", id: false, force: :cascade do |t|
-    t.bigint "flat_id", null: false
-    t.bigint "transport_id", null: false
+    t.bigint "flat_id"
+    t.bigint "transport_id"
+    t.index ["flat_id", "transport_id"], name: "index_flats_transports_on_flat_id_and_transport_id", unique: true
     t.index ["flat_id"], name: "index_flats_transports_on_flat_id"
     t.index ["transport_id"], name: "index_flats_transports_on_transport_id"
+  end
+
+  create_table "flats_universities", id: false, force: :cascade do |t|
+    t.bigint "flat_id"
+    t.bigint "university_id"
+    t.index ["flat_id", "university_id"], name: "index_flats_universities_on_flat_id_and_university_id", unique: true
+    t.index ["flat_id"], name: "index_flats_universities_on_flat_id"
+    t.index ["university_id"], name: "index_flats_universities_on_university_id"
   end
 
   create_table "meets", force: :cascade do |t|
@@ -127,6 +131,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_09_161658) do
   create_table "messages", force: :cascade do |t|
     t.bigint "conversation_id", null: false
     t.bigint "user_id", null: false
+    t.datetime "creation_date", null: false
     t.text "message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -209,6 +214,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_09_161658) do
     t.index ["university_to_meet_id"], name: "index_users_on_university_to_meet_id"
   end
 
+  create_table "visualizations", force: :cascade do |t|
+    t.bigint "story_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["story_id"], name: "index_visualizations_on_story_id"
+    t.index ["user_id"], name: "index_visualizations_on_user_id"
+  end
+
   add_foreign_key "bookmarks", "flats"
   add_foreign_key "bookmarks", "users"
   add_foreign_key "conversations", "users", column: "user1_id"
@@ -230,4 +244,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_09_161658) do
   add_foreign_key "users", "studies"
   add_foreign_key "users", "universities"
   add_foreign_key "users", "universities", column: "university_to_meet_id"
+  add_foreign_key "visualizations", "stories"
+  add_foreign_key "visualizations", "users"
 end

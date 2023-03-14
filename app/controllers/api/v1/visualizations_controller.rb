@@ -1,0 +1,17 @@
+class Api::V1::VisualizationsController < ApplicationController
+    before_action :current_user, only: [:create]
+
+    # POST /api/v1/visualizations
+    def create
+        user = User.find(params[:user_id])
+        story = Story.find(params[:story_id])
+
+        visualization = story.visualizations.build(user: user)
+
+        if visualization.save
+            render json: { visualization: true }, status: :created
+        else
+            render json: { visualization: false }
+        end
+    end
+end

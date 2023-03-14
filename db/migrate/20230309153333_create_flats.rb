@@ -20,21 +20,6 @@ class CreateFlats < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    create_join_table :flats, :users, table_name: :flats_tenants do |t|
-      t.index :flat_id
-      t.index :user_id
-    end
-
-    create_join_table :flats, :features, table_name: :flats_features do |t|
-      t.index :flat_id
-      t.index :feature_id
-    end
-
-    create_join_table :flats, :transports, table_name: :flats_transports do |t|
-      t.index :flat_id
-      t.index :transport_id
-    end
-
-    add_column :flats, :list_of_images, :text, array: true, default: []
+    add_column :flats, :images, :text, array: true, default: []
   end
 end

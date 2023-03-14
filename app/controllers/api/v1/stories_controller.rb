@@ -1,5 +1,5 @@
 class Api::V1::StoriesController < ApplicationController
-    before_action :current_user, except: [:show]
+    before_action :current_user
     before_action :set_story, only: [:destroy, :toggle_favourite]
 
     # GET /api/v1/stories
@@ -11,14 +11,9 @@ class Api::V1::StoriesController < ApplicationController
           stories << latest_story.as_json(
             except: [:user_id, :favourites, :faculty_id, :body, :creation_date, :created_at, :updated_at],
             include: {
-              faculty: { only: [:id, :faculty_name] },
+              faculty: { except: [:created_at, :updated_at] },
               user: {
-                except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
-                include: {
-                  university: { only: [:id, :name, :simple_name] },
-                  faculty: { only: [:id, :faculty_name] },
-                  study: { only: [:id, :study_name] },
-                }
+                except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at]
               }
             }
           )
@@ -31,26 +26,27 @@ class Api::V1::StoriesController < ApplicationController
     def show
       faculty = Faculty.find(params[:id])
 
-      stories = faculty.stories.includes(user: [:university, :faculty]).map do |story|
-        user = story.user.as_json(
-          except: [:meet_status, :sex_to_meet, :university_to_meet_id, :creation_date, :created_at, :updated_at],
+      stories = faculty.stories.includes(user: [:university, :faculty]).map do |s|
+        story = s.as_json(
+          except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
           include: {
-            university: { only: [:id, :name, :simple_name] },
-            faculty: { only: [:id, :faculty_name] },
-            study: { only: [:id, :study_name] }
-          })
+            user: {
+              except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at]
+            },
+            visualizations: {
+              except: [:created_at, :updated_at],
+              include: {
+                user: {
+                  except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at]
+                }
+              }
+            }
+          }
+        )
 
-        {
-          id: story.id,
-          user: user,
-          faculty: faculty.as_json(only: [:id, :faculty_name]),
-          body: story.body,
-          background_gradient_index: story.background_gradient_index,
-          creation_date: story.creation_date,
-          favourite: story.favourites.exists?(user_id: current_user.id),
-          already_conversation: current_user.initiated_conversations.exists?(user2_id: story.user.id) || current_user.received_conversations.exists?(user1_id: story.user.id),
-          own_story: current_user.uid == story.user.uid
-        }
+        story['favourite'] = s.favourites.exists?(user_id: @current_user.id)
+
+        story
       end
       render json: stories
     end
@@ -58,35 +54,30 @@ class Api::V1::StoriesController < ApplicationController
     # POST /api/v1/stories
     def create
       # Check if user has created more than 2 stories in the last 24 hours
-      if current_user.stories.where('created_at >= ?', 24.hours.ago).count >= 2
+      if @current_user.stories.where('created_at >= ?', 24.hours.ago).count >= 2
         render json: { error: 'You have reached the daily limit of story creation' }, status: :unprocessable_entity
         return
       end
 
       @story = Story.new(create_story_params)
-      @story.faculty = current_user.faculty
-      @story.user = current_user
+      @story.faculty = @current_user.faculty
+      @story.user = @current_user
 
       if @story.save
-        json = @story.as_json(
+        s = @story.as_json(
           include: {
             user: {
               except: [:created_at, :updated_at],
-              include: {
-                university: { only: [:id, :name, :simple_name] },
-                faculty: { only: [:id, :faculty_name] },
-                study: { only: [:id, :study_name] }
-              }
             },
             faculty: {
               except: [:updated_at, :favourites]
             }
           }
         )
-        json['favourite'] = false
-        json['own_story'] = true
-        json['already_conversation'] = false
-        render json: json, status: :created
+
+        s['favourite'] = false
+
+        render json: s, status: :created
       else
         render json: @story.errors, status: :unprocessable_entity
       end
@@ -94,18 +85,22 @@ class Api::V1::StoriesController < ApplicationController
 
     # DELETE /api/v1/stories/:id
     def destroy
-      @story.destroy
+      if @story.destroy
+        render json: { destroyed: true }
+      else
+        render json: { destroyed: false }
+      end
     end
   
     # PUT /api/v1/stories/:id/toggle_favourite
     def toggle_favourite
-      favourite = @story.favourites.find_by(user_id: current_user.id)
+      favourite = @story.favourites.find_by(user_id: @current_user.id)
       if favourite
         favourite.destroy
-        render json: { favourite: @story.favourites.exists?(user_id: current_user.id) }
+        render json: { favourite: @story.favourites.exists?(user_id: @current_user.id) }
       else
-        @story.favourites.create(user_id: current_user.id)
-        render json: { favourite: @story.favourites.exists?(user_id: current_user.id) }
+        @story.favourites.create(user_id: @current_user.id)
+        render json: { favourite: @story.favourites.exists?(user_id: @current_user.id) }
       end
     end
   

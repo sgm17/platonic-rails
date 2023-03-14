@@ -10,10 +10,10 @@ Rails.application.routes.draw do
       resources :universities, only: [:index]
 
       # User routes
-      resources :users, except: [:destroy]
+      resources :users
 
       # Meet routes
-      resources :meets, only: [:index]
+      resources :meets, only: [:index, :destroy]
 
       # Story routes
       resources :stories, except: [:update] do
@@ -32,9 +32,10 @@ Rails.application.routes.draw do
       end
       
       # Conversations routes
-      resources :conversations, only: [:index, :create] do
-        resources :messages, only: [:create]
-      end
+      resources :conversations, only: [:index, :create, :destroy]
+
+      # Visualization route
+      resources :visualizations, only: [:create]
       
     end
 
