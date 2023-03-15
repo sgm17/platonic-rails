@@ -3,10 +3,9 @@ class Api::V1::VisualizationsController < ApplicationController
 
     # POST /api/v1/visualizations
     def create
-        user = User.find(params[:user_id])
         story = Story.find(params[:story_id])
 
-        visualization = story.visualizations.build(user: user)
+        visualization = story.visualizations.build(user: @current_user)
 
         if visualization.save
             render json: { visualization: true }, status: :created
