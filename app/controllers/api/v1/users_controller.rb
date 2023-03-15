@@ -100,12 +100,21 @@ class Api::V1::UsersController < ApplicationController
       end
     end
 
+    # PUT /api/v1/users/cloud_token
+    def cloud_token
+      if @current_user.update(params[:cloud_token])
+        render json: { updated: true }
+      else
+        render json: { updated: false }
+      end
+    end
+
     # DELETE /users/1
     def destroy
         if @current_user.destroy
-          render json: { destroyed: true}
+          render json: { destroyed: true }
         else
-          render json: { destroyed: false}
+          render json: { destroyed: false }
         end
     end
 

@@ -10,7 +10,11 @@ Rails.application.routes.draw do
       resources :universities, only: [:index]
 
       # User routes
-      resources :users
+      resources :users do
+        collection do
+          put :cloud_token
+        end
+      end
 
       # Meet routes
       resources :meets, only: [:index, :destroy]
@@ -25,7 +29,7 @@ Rails.application.routes.draw do
       # Image routes
       resources :images, only: [:index, :create] do
         collection do
-          post 'create_multiple'
+          post :create_multiple
         end
       end
 
