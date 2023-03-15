@@ -66,6 +66,25 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    aws-eventstream (1.2.0)
+    aws-partitions (1.727.0)
+    aws-sdk-core (3.170.0)
+      aws-eventstream (~> 1, >= 1.0.2)
+      aws-partitions (~> 1, >= 1.651.0)
+      aws-sigv4 (~> 1.5)
+      jmespath (~> 1, >= 1.6.1)
+    aws-sdk-kms (1.63.0)
+      aws-sdk-core (~> 3, >= 3.165.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-s3 (1.119.1)
+      aws-sdk-core (~> 3, >= 3.165.0)
+      aws-sdk-kms (~> 1)
+      aws-sigv4 (~> 1.4)
+    aws-sdk-sns (1.60.0)
+      aws-sdk-core (~> 3, >= 3.165.0)
+      aws-sigv4 (~> 1.1)
+    aws-sigv4 (1.5.2)
+      aws-eventstream (~> 1, >= 1.0.2)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
     builder (3.2.4)
@@ -87,6 +106,7 @@ GEM
     io-console (0.6.0)
     irb (1.6.3)
       reline (>= 0.3.0)
+    jmespath (1.6.2)
     jwt (2.7.0)
     loofah (2.19.1)
       crass (~> 1.0.2)
@@ -156,7 +176,6 @@ GEM
     redis (4.8.1)
     reline (0.3.2)
       io-console (~> 0.5)
-    rgeo (3.0.0)
     thor (1.2.1)
     timeout (0.3.2)
     tzinfo (2.0.6)
@@ -172,6 +191,8 @@ PLATFORMS
   x64-mingw-ucrt
 
 DEPENDENCIES
+  aws-sdk-s3
+  aws-sdk-sns
   bootsnap
   debug
   dotenv
@@ -182,7 +203,6 @@ DEPENDENCIES
   rack-cors
   rails (~> 7.0.4, >= 7.0.4.2)
   redis (~> 4.0)
-  rgeo
   tzinfo-data
 
 RUBY VERSION

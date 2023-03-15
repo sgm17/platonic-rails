@@ -22,6 +22,13 @@ Rails.application.routes.draw do
         end
       end
 
+      # Image routes
+      resources :images, only: [:index, :create] do
+        collection do
+          post 'create_multiple'
+        end
+      end
+
       # Flats routes
       resources :flats do
         collection do
