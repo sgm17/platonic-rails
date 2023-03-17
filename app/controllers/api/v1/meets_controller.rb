@@ -11,7 +11,12 @@ class Api::V1::MeetsController < ApplicationController
         meet = {
           id: meet.id,
           user: user.as_json(
-            except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at]
+            except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
+            include: {
+              university: {},
+              faculty: {},
+              study: {}
+            }
           )
         }
       end

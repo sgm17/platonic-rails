@@ -31,13 +31,14 @@ class Api::V1::StoriesController < ApplicationController
           except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
           include: {
             user: {
-              except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at]
+              except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
             },
+            faculty: {},
             visualizations: {
               except: [:created_at, :updated_at],
               include: {
                 user: {
-                  except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at]
+                  except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
                 }
               }
             }
@@ -55,7 +56,7 @@ class Api::V1::StoriesController < ApplicationController
     def create
       # Check if user has created more than 2 stories in the last 24 hours
       if @current_user.stories.where('created_at >= ?', 24.hours.ago).count >= 2
-        render json: { error: 'You have reached the daily limit of story creation' }, status: :unprocessable_entity
+        render json: { error: 'You have reached the daily limit of story creation' }, status: :too_many_requests
         return
       end
 

@@ -4,6 +4,4 @@ class Conversation < ApplicationRecord
   has_many :messages, dependent: :destroy
 
   validates :user1, :user2, presence: true
-  
-  after_create_commit { ConversationBroadcastJob.perform_later(self) }
 end

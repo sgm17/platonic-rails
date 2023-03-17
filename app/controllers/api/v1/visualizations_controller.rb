@@ -6,7 +6,7 @@ class Api::V1::VisualizationsController < ApplicationController
         story = Story.find(params[:story_id])
 
         visualization = story.visualizations.build(user: @current_user)
-
+        
         if visualization.save
             render json: { visualization: true }, status: :created
         else

@@ -4,31 +4,55 @@ class Api::V1::ConversationsController < ApplicationController
     # GET /api/v1/conversations
     def index
       conversations = @current_user.conversations.map do |conversation|
-        other_user = conversation.user1_id == @current_user.id ? conversation.user2 : conversation.user1
-        last_message = conversation.messages.last
-        {
-          id: conversation.id,
-          user: other_user.as_json(
-            except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
-          ),
-          messages: conversation.messages.as_json(
-            except: [:created_at, :updated_at])
-        }
+        conversation.as_json(
+          except: [:created_at, :updated_at],
+          include: {
+            user1: {},
+            user2: {}
+          }
+        )
       end
       render json: conversations
     end
 
     # POST /api/v1/conversations
-    def create
-      conversation = @current_user.initiated_conversations.build(user1_id: @current_user.id, user2_id: params[:user_id])
+    # def create
+    #   conversation = @current_user.initiated_conversations.build(user2_id: params[:user2_id])
+    #   
+    #   if conversation.save
+    #     json = conversation.as_json(
+    #       include: {
+    #         user1: {},
+    #         user2: {}
+    #       }
+    #     )
+    #     ConversationBroadcastJob.perform_later(json)
+    #     render json: json, status: :created
+    #   else
+    #     render json: { errors: conversation.errors.full_messages }, status: :unprocessable_entity
+    #   end
+    # end
 
-      if conversation.save
-        ConversationBroadcastJob.perform_later(conversation)
-        render json: { id: conversation.id }, status: :created
-      else
-        render json: { errors: conversation.errors.full_messages }, status: :unprocessable_entity
-      end
-    end
+    # POST /api/v1/conversations/:conversation_id/create_message
+    # def create_message
+    #   conversation = current_user.conversations.find(params[:conversation_id])
+    #   message = conversation.messages.build(body: params[:body], user_id: params[:user_id], creation_date: params[:creation_date])
+    # 
+    #   if message.save
+    # 
+    #     json = message.conversation.as_json(
+    #       include: {
+    #         user1: {},
+    #         user2: {}
+    #       }
+    #     )
+    # 
+    #     ConversationBroadcastJob.perform_later(json)
+    #     render json: message, status: :created
+    #   else
+    #     render json: { errors: message.errors.full_messages }, status: :unprocessable_entity
+    #   end
+    # end
 
     # DELETE /api/v1/conversations/:conversation_id
     def destroy

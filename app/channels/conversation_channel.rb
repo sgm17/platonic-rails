@@ -1,38 +1,52 @@
 class ConversationChannel < ApplicationCable::Channel
   def subscribed
-    params[:conversation_ids].each do |id|
-      conversation = Conversation.find(id)
-      stream_for conversation
-    end
+    stream_for current_user
   end
 
-  def new_message(data)
-    data = data['data']
-
-    conversation = Conversation.find(data['conversation_id'])
-
-    message = conversation.messages.build(
-      message: data['message'], 
-      user_id: data['user_id'], 
-      creation_date: data['creation_date']
-    )
-
-    if message.save
-      ConversationBroadcastJob.perform_later(message)
-    end
-  end
-
-  def new_conversation(data)
-    data = data['data']
-
-    conversation = @current_user.initiated_conversations.build(user1_id: @current_user.id, user2_id: data['user_id'])
+  def create_conversation(data)
+    conversation = current_user.initiated_conversations.build(user2_id: data["user2_id"])
 
     if conversation.save
-      ConversationBroadcastJob.perform_later(conversation)
+      
+      message = conversation.messages.build(
+        body: data['body'], 
+        user_id: data['user_id'], 
+        creation_date: data['creation_date']
+      )
+
+      if message.save
+        ConversationBroadcastJob.perform_later(conversation)
+      end
     end
+  end
+
+  def get_conversations
+    conversations = current_user.conversations.includes(:user1, :user2, messages: [:user]).map do |conversation|
+      conversation.as_json(
+        except: [:created_at, :updated_at],
+        include: {
+          user1: {
+            include: {
+              university: {},
+              faculty: {},
+              study: {}
+            }
+          },
+          user2: {
+            include: {
+              university: {},
+              faculty: {},
+              study: {}
+            }
+          },
+          messages: { include: :user }
+        }
+      )
+    end
+  
+    ConversationsBroadcastJob.perform_later(current_user, conversations)
   end
 
   def unsubscribed
-    # Any cleanup needed when channel is unsubscribed
   end
 end
