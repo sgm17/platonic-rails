@@ -43,11 +43,7 @@ Rails.application.routes.draw do
       end
       
       # Conversations routes
-      resources :conversations, only: [:index, :create, :destroy] #do
-        #member do
-        #  post :create_message
-        #end
-      #end
+      resources :conversations, only: [:index, :destroy]
 
       # Visualization route
       resources :visualizations, only: [:create]

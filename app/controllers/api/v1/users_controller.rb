@@ -12,7 +12,8 @@ class Api::V1::UsersController < ApplicationController
           university: { except: [:created_at, :updated_at] },
           faculty: { except: [:created_at, :updated_at] },
           study: { except: [:created_at, :updated_at] },
-          faculties_to_meet: { only: [:id] }
+          university_to_meet: { except: [:created_at, :updated_at] },
+          faculties_to_meet: { except: [:created_at, :updated_at] }
         }
       )
     end
