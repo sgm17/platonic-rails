@@ -3,6 +3,14 @@ class ConversationChannel < ApplicationCable::Channel
     stream_for current_user
   end
 
+  def delete_conversation(data)
+    conversation = Conversation.find(data['id'])
+
+    if conversation.destroy
+      DeleteConversationBroadcastJob.perform_later(conversation)
+    end
+  end
+
   def create_conversation(data)
     conversation = current_user.initiated_conversations.build(user2_id: data["user2_id"])
 

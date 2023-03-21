@@ -4,6 +4,9 @@ class MessageBroadcastJob < ApplicationJob
   def perform(message)
     message = Message.new(message)
     conversation = Conversation.find(message[:conversation_id])
-    MessageChannel.broadcast_to(conversation, message.as_json)
+
+    json = {"message" => message.as_json}
+
+    MessageChannel.broadcast_to(conversation, json)
   end
 end

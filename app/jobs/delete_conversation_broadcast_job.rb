@@ -1,8 +1,8 @@
-class ConversationBroadcastJob < ApplicationJob
+class DeleteConversationBroadcastJob < ApplicationJob
   queue_as :default
 
   def perform(conversation)
-    new_conversation = conversation.as_json(include: {
+    delete_conversation = conversation.as_json(include: {
       messages: {},
       user1: {
         include: {
@@ -23,7 +23,7 @@ class ConversationBroadcastJob < ApplicationJob
     user1 = User.find(conversation.user1_id)
     user2 = User.find(conversation.user2_id)
 
-    json = {"new_conversation" => new_conversation}
+    json = {"delete_conversation" => delete_conversation}
 
     ConversationChannel.broadcast_to(user1, json)
     ConversationChannel.broadcast_to(user2, json)

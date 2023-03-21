@@ -41,9 +41,6 @@ Rails.application.routes.draw do
         post :bookmark, on: :member
         post :add_remove_tenant
       end
-      
-      # Conversations routes
-      resources :conversations, only: [:index, :destroy]
 
       # Visualization route
       resources :visualizations, only: [:create]
