@@ -38,7 +38,7 @@ class Api::V1::StoriesController < ApplicationController
               except: [:created_at, :updated_at],
               include: {
                 user: {
-                  except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
+                  only: [:id, :uid, :cloud_token, :name, :email, :sex, :age, :profile_image, :meet_picture, :university_id, :faculty_id, :study_id],
                 }
               }
             }
