@@ -25,12 +25,11 @@ class Api::V1::ImagesController < ApplicationController
         begin
             s3 = s3_resource
             bucket = s3.bucket(ENV['AWS_BUCKET_NAME'])
-            object = bucket.object(params[:image].original_filename)
-            object.upload_file(params[:image].tempfile, acl: 'private')
-            name = object.public_url.split('.')[0]
-            format = object.public_url.split('.')[1]
+            image = params[:image]
+            object = bucket.object(image.original_filename)
+            object.upload_file(image.tempfile, acl: 'private')
             
-            render json: { name: name, format: format }, status: :created
+            render json: {name: image.original_filename.split('.')[0], format: image.original_filename.split('.')[1]}, status: :created
         rescue => e
             render json: { error: e.message }, status: :unprocessable_entity
         end
@@ -45,10 +44,8 @@ class Api::V1::ImagesController < ApplicationController
                 bucket = s3.bucket(ENV['AWS_BUCKET_NAME'])
                 object = bucket.object(image.original_filename)
                 object.upload_file(image.tempfile, acl: 'private')
-                name = object.public_url.split('.')[0]
-                format = object.public_url.split('.')[0]
 
-                name_format << {name: name, format: format}
+                name_format << {name: image.original_filename.split('.')[0], format: image.original_filename.split('.')[1]}
             rescue => e
                 render json: { error: e.message }, status: :unprocessable_entity
             end

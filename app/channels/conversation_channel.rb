@@ -4,7 +4,7 @@ class ConversationChannel < ApplicationCable::Channel
   end
 
   def delete_conversation(data)
-    conversation = Conversation.find(data['conversation_id'])
+    conversation = Conversation.find(data['id'])
 
     if conversation.destroy
       DeleteConversationBroadcastJob.perform_later(conversation)

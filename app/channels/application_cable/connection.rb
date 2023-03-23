@@ -7,7 +7,8 @@ module ApplicationCable
     end
 
     def authenticate_user
-      current_user = User.find_by(uid: 'hR1NbH4yhsMZJ9aZJuzqErzBwPJ3')
+      current_user ||= User.find_by(uid: request.env['firebase.user'][0]['user_id'])
+      
       if current_user
         current_user
       else
