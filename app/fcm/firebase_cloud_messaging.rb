@@ -2,10 +2,7 @@ require 'googleauth'
 require 'google/apis/fcm_v1'
 
 class FirebaseCloudMessaging
-  def initialize(project_id, service_account_key_path)
-    # Initialize the Project id
-    @project_id = project_id
-
+  def initialize(service_account_key_path)
     # Initialize the API client with the service account credentials
     @fcm = Google::Apis::FcmV1::FirebaseCloudMessagingService.new
     @fcm.authorization = Google::Auth::ServiceAccountCredentials.make_creds(
@@ -14,30 +11,27 @@ class FirebaseCloudMessaging
     )
   end
 
-  def send_push_notification(cloud_token, title, body, title_key, body_key)
+  def send_push_notification(cloud_token, title, body, type, data)
     message = Google::Apis::FcmV1::SendMessageRequest.new(
       message: {
         token: cloud_token,
         notification: {
           title: title,
-          body: body
+          body: body,
         },
         android: {
           priority: "high"
         },
-        apns: {
-          payload: {
-            aps: {
-              sound: "default",
-              alert: {
-                title_loc_key: title_key,
-                body_loc_key: body_key
-              }
-            }
-          }
+        data: {
+          "type": type,
+          ...data
         }
       }
     )
-    response = @fcm.send_message("projects/#{@project_id}", message)
+    response = @fcm.send_message("projects/#{ENV['PROJECT_ID']}", message) do |result, err|
+      unless err.nil?
+        p err
+      end
+    end
   end
 end

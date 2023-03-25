@@ -5,12 +5,10 @@ class ApplicationController < ActionController::API
     end
 
     def firebase_cloud_messaging
-        service_account_key_path = Rails.root.join('app', 'assets', 'platonic-3bc9d-firebase-adminsdk-oihb8-5560f86132.json')
+        service_account_key_path = Rails.root.join('app', 'assets', 'firebase', ENV['ADMIN_FILE_NAME'])
 
         @firebase_cloud_messaging = FirebaseCloudMessaging.new(
-          "platonic-3bc9d",
           service_account_key_path
         )
-      end
-      
+    end
 end

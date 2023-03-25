@@ -4,7 +4,7 @@ class Api::V1::UniversitiesController < ApplicationController
     def index
 
       @firebase_cloud_messaging.send_push_notification(
-        "fKGsQZRvQq6TqHr2R-WbRx:APA91bFs9iH9SRC3odYxLEpZd9gUff3JvWjJ6xLZ_bwFw57aotJ98vITa5_MtzyXdT0S4WE_IrIftw6oBjgXXZslHtBwhiHqiJZctpXIkp-91LB51NS8kgiq9TkxhuHcjfOFdZm-4PEa",
+        "fxfHocONQdeNUFzB9bJcFM:APA91bERXD_2u4Cgo6AJtBap2Stj6yryL4vopCIxivRlPDs4rvg35pLHGg4pvdrQ6njzxa-Tkmt2TBDUm3Fj4-Q0tnpbHvso9hd6wLCwJCCqdC8mnLopZ332jhvaXQzFAvJkhwChcwiz",
         "title",
         "body",
         "title_key",

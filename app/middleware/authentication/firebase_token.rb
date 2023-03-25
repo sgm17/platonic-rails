@@ -5,7 +5,6 @@ require 'jwt'
 class FirebaseToken
   JWT_ALGORITHM = 'RS256'.freeze
   PUBLIC_KEY_URL = 'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com'.freeze
-  FIREBASE_PROJECT_ID = 'platonic-3bc9d'
 
   def initialize(token)
     @token = token
@@ -56,9 +55,9 @@ class FirebaseToken
       algorithm: JWT_ALGORITHM,
       verify_iat: true,
       verify_aud: true,
-      aud: FIREBASE_PROJECT_ID,
+      aud: ENV['PROJECT_ID'],
       verify_iss: true,
-      iss: "https://securetoken.google.com/#{FIREBASE_PROJECT_ID}"
+      iss: "https://securetoken.google.com/#{ENV['PROJECT_ID']}"
     }
 
     JWT.decode(@token, public_key, true, options)

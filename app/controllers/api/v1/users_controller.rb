@@ -90,10 +90,10 @@ class Api::V1::UsersController < ApplicationController
 
     # PUT /api/v1/users/cloud_token
     def cloud_token
-      if @current_user.update(params[:cloud_token])
+      if @current_user.update(update_cloud_params)
         render json: { updated: true }
       else
-        render json: { updated: false }
+        render json: @current_user.errors, status: :unprocessable_entity
       end
     end
 
@@ -102,7 +102,7 @@ class Api::V1::UsersController < ApplicationController
         if @current_user.destroy
           render json: { destroyed: true }
         else
-          render json: { destroyed: false }
+          render json: @current_user.errors, status: :unprocessable_entity
         end
     end
 
@@ -115,5 +115,9 @@ class Api::V1::UsersController < ApplicationController
 
     def update_user_params
       params.require(:user).permit(:profile_image, :meet_picture, :meet_status, :sex_to_meet, :university_to_meet_id)
+    end
+
+    def update_cloud_params
+      params.require(:user).permit(:cloud_token)
     end
 end
