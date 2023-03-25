@@ -36,6 +36,10 @@ gem "dotenv"
 gem 'aws-sdk-s3'
 gem 'aws-sdk-sns'
 
+# Firebase Cloud Messaging
+gem 'googleauth'
+gem 'google-apis-fcm_v1'
+
 # schedule
 gem 'whenever', require: false
 

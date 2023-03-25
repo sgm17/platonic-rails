@@ -1,13 +1,13 @@
 class DeleteConversationBroadcastJob < ApplicationJob
   queue_as :default
 
-  def perform(conversation)
-    delete_conversation = conversation.as_json(only: [:id])
+  def perform(conversation_json)
+    user1 = User.find(conversation_json['user1_id'])
+    user2 = User.find(conversation_json['user2_id'])
 
-    user1 = User.find(conversation.user1_id)
-    user2 = User.find(conversation.user2_id)
+    json = {"delete_conversation" => {"id" => conversation_json['id'] } }
 
-    json = {"delete_conversation" => delete_conversation}
+    p user1, user2, json
 
     ConversationChannel.broadcast_to(user1, json)
     ConversationChannel.broadcast_to(user2, json)

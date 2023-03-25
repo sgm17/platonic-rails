@@ -3,23 +3,19 @@ class Api::V1::UsersController < ApplicationController
 
     # GET /api/v1/users
     def index
-      begin  
-        faculties_to_meet = @current_user.faculties_to_meet.map do |faculty|
-          faculty.as_json(only: [:id])
-        end
-        render json: @current_user.as_json(
-          except: [:created_at, :updated_at],
-          include: {
-            university: { except: [:created_at, :updated_at] },
-            faculty: { except: [:created_at, :updated_at] },
-            study: { except: [:created_at, :updated_at] },
-            university_to_meet: { except: [:created_at, :updated_at] },
-            faculties_to_meet: { except: [:created_at, :updated_at] }
-          }
-        )
-      rescue => e
-        render json: { error: e.message }, status: :unprocessable_entity
+      faculties_to_meet = @current_user.faculties_to_meet.map do |faculty|
+        faculty.as_json(only: [:id])
       end
+      render json: @current_user.as_json(
+        except: [:created_at, :updated_at],
+        include: {
+          university: { except: [:created_at, :updated_at] },
+          faculty: { except: [:created_at, :updated_at] },
+          study: { except: [:created_at, :updated_at] },
+          university_to_meet: { except: [:created_at, :updated_at] },
+          faculties_to_meet: { except: [:created_at, :updated_at] }
+        }
+      )
     end
 
     # POST /api/v1/users

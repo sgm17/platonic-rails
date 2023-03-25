@@ -6,8 +6,10 @@ class ConversationChannel < ApplicationCable::Channel
   def delete_conversation(data)
     conversation = Conversation.find(data['id'])
 
+    json = conversation.as_json()
+
     if conversation.destroy
-      DeleteConversationBroadcastJob.perform_later(conversation)
+      DeleteConversationBroadcastJob.perform_later(json)
     end
   end
 
