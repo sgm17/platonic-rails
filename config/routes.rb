@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       resources :stories, except: [:update] do
         member do
           put :toggle_favourite
+          post :visualizations
         end
       end
 
@@ -40,11 +41,7 @@ Rails.application.routes.draw do
         end
         post :bookmark, on: :member
         post :add_remove_tenant
-      end
-
-      # Visualization route
-      resources :visualizations, only: [:create]
-      
+      end 
     end
 
     namespace :v2 do

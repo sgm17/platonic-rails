@@ -30,7 +30,7 @@ class Api::V1::MeetsController < ApplicationController
       if meet.destroy
         render json: { destroyed: true }
       else
-        render json: { destroyed: false }
+        render json: meet.errors, status: :unprocessable_entity
       end
     end
 
@@ -129,18 +129,6 @@ class Api::V1::MeetsController < ApplicationController
           Meet.create(user1: male, user2: match)
         end
       end
-    end
-
-    private
-  
-    # Use callbacks to share common setup or constraints between actions.
-    def set_meet
-      @meet = current_user.meets.find(params[:id])
-    end
-  
-    # Only allow a trusted parameter "white list" through.
-    def meet_params
-      params.require(:meet).permit(:user_id, :location, :time, :description)
     end
   end
   

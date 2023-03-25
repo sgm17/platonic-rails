@@ -3,9 +3,6 @@ class Api::V1::UsersController < ApplicationController
 
     # GET /api/v1/users
     def index
-      faculties_to_meet = @current_user.faculties_to_meet.map do |faculty|
-        faculty.as_json(only: [:id])
-      end
       render json: @current_user.as_json(
         except: [:created_at, :updated_at],
         include: {

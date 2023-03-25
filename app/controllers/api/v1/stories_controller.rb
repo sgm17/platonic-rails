@@ -1,12 +1,12 @@
 class Api::V1::StoriesController < ApplicationController
     before_action :current_user
-    before_action :set_story, only: [:destroy, :toggle_favourite]
+    before_action :set_story, only: [:destroy, :toggle_favourite, :visualizations]
 
     # GET /api/v1/stories
     def index
       stories = []
       @current_user.university.faculties.each do |faculty|
-        latest_story = faculty.stories.last
+        latest_story = faculty.stories.where('created_at >= ?', 24.hours.ago).last
         next if latest_story.nil?
           stories << latest_story.as_json(
             except: [:user_id, :favourites, :faculty_id, :body, :creation_date, :created_at, :updated_at],
@@ -18,16 +18,15 @@ class Api::V1::StoriesController < ApplicationController
             }
           )
       end
-      render json: stories.to_json
+      render json: stories
     end
     
       
     # GET /api/v1/stories/:faculty_id
     def show
       faculty = Faculty.find(params[:id])
-
-      stories = faculty.stories.includes(user: [:university, :faculty]).map do |s|
-        story = s.as_json(
+      stories = faculty.stories.where('created_at >= ?', 24.hours.ago).includes(user: [:university, :faculty]).map do |story|
+        story_json = story.as_json(
           except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
           include: {
             user: {
@@ -45,9 +44,9 @@ class Api::V1::StoriesController < ApplicationController
           }
         )
 
-        story['favourite'] = s.favourites.exists?(user_id: @current_user.id)
+        story_json['favourite'] = s.favourites.exists?(user_id: @current_user.id)
 
-        story
+        story_json
       end
       render json: stories
     end
@@ -65,7 +64,7 @@ class Api::V1::StoriesController < ApplicationController
       @story.user = @current_user
 
       if @story.save
-        s = @story.as_json(
+        story_json = @story.as_json(
           include: {
             user: {
               except: [:created_at, :updated_at],
@@ -76,9 +75,9 @@ class Api::V1::StoriesController < ApplicationController
           }
         )
 
-        s['favourite'] = false
+        story_json['favourite'] = false
 
-        render json: s, status: :created
+        render json: story_json, status: :created
       else
         render json: @story.errors, status: :unprocessable_entity
       end
@@ -89,7 +88,7 @@ class Api::V1::StoriesController < ApplicationController
       if @story.destroy
         render json: { destroyed: true }
       else
-        render json: { destroyed: false }
+        render json: @story.errors, status: :unprocessable_entity
       end
     end
   
@@ -102,6 +101,21 @@ class Api::V1::StoriesController < ApplicationController
       else
         @story.favourites.create(user_id: @current_user.id)
         render json: { favourite: @story.favourites.exists?(user_id: @current_user.id) }
+      end
+    end
+
+    # POST /api/v1/stories/:id/visualizations
+    def visualizations
+      visualization = @story.visualizations.find_or_initialize_by(user: @current_user)
+      
+      if visualization.new_record?
+        if visualization.save
+          render json: { visualization: true }, status: :created
+        else
+          render json: visualization.errors, status: :unprocessable_entity
+        end
+      else
+        render json: { visualization: false }, status: :ok
       end
     end
   

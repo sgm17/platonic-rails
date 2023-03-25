@@ -4,8 +4,7 @@ class Api::V1::FlatsController < ApplicationController
 
     # GET /api/v1/flats
     def index
-        flats = Flat.joins(owner: :university)
-                    .where('users.university_id = ? OR universities.id = ?', @current_user.university_id, @current_user.university_id)
+        flats = Flat.joins(owner: :university).where('users.university_id = ? OR universities.id = ?', @current_user.university_id, @current_user.university_id)
 
             flat_models = flats.map do |flat|
             bookmark = flat.bookmarks.exists?(user: @current_user)
@@ -50,7 +49,7 @@ class Api::V1::FlatsController < ApplicationController
         if @flat.update(tenants: @flat.tenants)
             render json: @flat.tenants, status: :ok
         else
-            render json: { error: 'Failed to update flat' }, status: :unprocessable_entity
+            render json: @flat.errors, status: :unprocessable_entity
         end
     end
 
@@ -159,9 +158,13 @@ class Api::V1::FlatsController < ApplicationController
         end
     end
 
-    # DELETE /api/v1/flats/flat_id
+    # DELETE /api/v1/flats/:flat_id
     def destroy
-        @flat.destroy
+        if @flat.destroy
+            render json: { destroyed: true }
+        else
+            render json: @flat.errors, status: :unprocessable_entity
+        end
     end
 
     # PATCH/PUT /api/v1/flats/flat_id
@@ -184,7 +187,7 @@ class Api::V1::FlatsController < ApplicationController
 
             render json: @flat, include: [:transports, :properties, :features], status: :ok
         else
-          render json: { errors: @flat.errors.full_messages }, status: :unprocessable_entity
+          render json: @flat.errors, status: :unprocessable_entity
         end
     end
 
