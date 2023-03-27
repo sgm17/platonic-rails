@@ -53,9 +53,6 @@ Rails.application.configure do
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
 
-  # Firebase Credentials
-  ENV['GOOGLE_APPLICATION_CREDENTIALS'] = 'app\assets\firebase\platonic-3bc9d-firebase-adminsdk-oihb8-49ff69adb8.json'
-
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
