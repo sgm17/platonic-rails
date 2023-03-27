@@ -44,7 +44,7 @@ class Api::V1::StoriesController < ApplicationController
           }
         )
 
-        story_json['favourite'] = s.favourites.exists?(user_id: @current_user.id)
+        story_json['favourite'] = story.favourites.exists?(user_id: @current_user.id)
 
         story_json
       end
@@ -100,6 +100,9 @@ class Api::V1::StoriesController < ApplicationController
         render json: { favourite: @story.favourites.exists?(user_id: @current_user.id) }
       else
         @story.favourites.create(user_id: @current_user.id)
+
+        PushNotificationJob.perform_later(@story.user.id, "A #{@current_user.name} le ha gustado tu historia", nil, "favourite", {"faculty_id" => @story.faculty.id})
+        
         render json: { favourite: @story.favourites.exists?(user_id: @current_user.id) }
       end
     end

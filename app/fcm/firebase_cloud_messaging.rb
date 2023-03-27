@@ -23,9 +23,8 @@ class FirebaseCloudMessaging
           priority: "high"
         },
         data: {
-          "type": type,
-          ...data
-        }
+          "type": type
+        }.merge(data)
       }
     )
     response = @fcm.send_message("projects/#{ENV['PROJECT_ID']}", message) do |result, err|

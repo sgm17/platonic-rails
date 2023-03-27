@@ -104,6 +104,9 @@ class Api::V1::MeetsController < ApplicationController
           # Remove matched male from males array
           males = males.where.not(id: match.id)
 
+          PushNotificationJob.perform_later(female.id, "Tienes un meet nuevo con #{match.name}", nil, "meet", match.as_json)
+          PushNotificationJob.perform_later(match.id, "Tienes un meet nuevo con #{female.name}", nil, "meet", female.as_json)
+
           # Create Meet record
           Meet.create(user1: female, user2: match)
         end
@@ -125,6 +128,9 @@ class Api::V1::MeetsController < ApplicationController
         if match
           # Add match to male_matches hash
           male_matches[male.id] = match.id
+
+          PushNotificationJob.perform_later(male.id, "Tienes un meet nuevo con #{match.name}", nil, "meet", match.as_json)
+          PushNotificationJob.perform_later(match.id, "Tienes un meet nuevo con #{male.name}", nil, "meet", male.as_json)
 
           Meet.create(user1: male, user2: match)
         end
