@@ -25,7 +25,7 @@ class ConversationChannel < ApplicationCable::Channel
       )
 
       if message.save
-        PushNotificationJob.perform_later(data["user2_id"], "#{current_user.name} te ha enviado un mensaje:", data["body"], "chat", current_user.as_json)
+        PushNotificationJob.perform_later(data["user2_id"], "#{current_user.name} te ha enviado un mensaje:", data["body"], "chat", current_user.as_json.transform_values(&:to_s))
 
         ConversationBroadcastJob.perform_later(conversation)
       end
