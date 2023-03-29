@@ -34,7 +34,7 @@ class Api::V1::MeetsController < ApplicationController
       end
     end
 
-    def create_meetings
+    def self.create_meetings
       users = User.where(meet_status: true)
 
       # Separate male and female users
@@ -97,7 +97,7 @@ class Api::V1::MeetsController < ApplicationController
     private
 
     # Define a function to match users
-    def self.match_users(user, users_to_match)
+    def match_users(user, users_to_match)
       # Sort users_to_match by faculty, to prioritize matches on the same faculty
       users_to_match = users_to_match.order(faculty_id: :desc)
 
