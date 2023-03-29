@@ -41,49 +41,6 @@ class Api::V1::MeetsController < ApplicationController
       males = users.where(sex: 0)
       females = users.where(sex: 1)
 
-      # Define a function to match users
-      def match_users(user, users_to_match)
-        # Sort users_to_match by faculty, to prioritize matches on the same faculty
-        users_to_match = users_to_match.order(faculty_id: :desc)
-
-        # Exclude users that have already been matched
-        users_to_match = users_to_match.where.not(id: user.meets.pluck(:user2_id))
-
-        # Check if any user in users_to_match matches all preferences
-        perfect_matches = users_to_match.where(
-          university_id: user.university_to_meet_id,
-          sex: user.sex_to_meet,
-          faculty_id: user.faculties_to_meet
-        )
-
-        if perfect_matches.any?
-          # Return the first perfect match
-          return perfect_matches.first
-        end
-
-        # Check if any user in users_to_match matches only university and sex preferences
-        basic_matches = users_to_match.where(
-          university_id: user.university_to_meet_id,
-          sex: user.sex_to_meet
-        )
-
-        if basic_matches.any?
-          # Return the first basic match
-          return basic_matches.first
-        end
-
-        # Check if any user in users_to_match matches only sex preference
-        sex_matches = users_to_match.where(sex: user.sex_to_meet)
-
-        if sex_matches.any?
-          # Return the first sex match
-          return sex_matches.first
-        end
-
-        # No match found
-        return nil
-      end
-
       # Iterate over female users and match them with male users
       female_matches = {}
 
@@ -135,6 +92,51 @@ class Api::V1::MeetsController < ApplicationController
           Meet.create(user1: male, user2: match)
         end
       end
+    end
+
+    private
+
+    # Define a function to match users
+    def self.match_users(user, users_to_match)
+      # Sort users_to_match by faculty, to prioritize matches on the same faculty
+      users_to_match = users_to_match.order(faculty_id: :desc)
+
+      # Exclude users that have already been matched
+      users_to_match = users_to_match.where.not(id: user.meets.pluck(:user2_id))
+
+      # Check if any user in users_to_match matches all preferences
+      perfect_matches = users_to_match.where(
+        university_id: user.university_to_meet_id,
+        sex: user.sex_to_meet,
+        faculty_id: user.faculties_to_meet
+      )
+
+      if perfect_matches.any?
+        # Return the first perfect match
+        return perfect_matches.first
+      end
+
+      # Check if any user in users_to_match matches only university and sex preferences
+      basic_matches = users_to_match.where(
+        university_id: user.university_to_meet_id,
+        sex: user.sex_to_meet
+      )
+
+      if basic_matches.any?
+        # Return the first basic match
+        return basic_matches.first
+      end
+
+      # Check if any user in users_to_match matches only sex preference
+      sex_matches = users_to_match.where(sex: user.sex_to_meet)
+
+      if sex_matches.any?
+        # Return the first sex match
+        return sex_matches.first
+      end
+
+      # No match found
+      return nil
     end
   end
   
