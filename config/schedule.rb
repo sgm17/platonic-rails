@@ -4,5 +4,5 @@
 # http://en.wikipedia.org/wiki/Cron
 
 every :day, at: '1pm', timezone: 'Pacific Time (US & Canada)' do
-	command "/home/ubuntu/.rbenv/shims/ruby /home/ubuntu/platonic-rails/app/bin/rails runner -e production 'Api::V1::MeetsController.create_meetings'"
+	command "PGUSER=platonic PGPASSWORD=1234 /bin/bash -l -c '/home/ubuntu/.rbenv/shims/ruby /home/ubuntu/platonic-rails/bin/rails runner -e production '\''Api::V1::MeetsController.create_meetings'\'''"
 end
