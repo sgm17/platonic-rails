@@ -97,7 +97,7 @@ class Api::V1::MeetsController < ApplicationController
     private
 
     # Define a function to match users
-    def match_users(user, users_to_match)
+    def self.match_users(user, users_to_match)
       # Sort users_to_match by faculty, to prioritize matches on the same faculty
       users_to_match = users_to_match.order(faculty_id: :desc)
 
