@@ -35,22 +35,21 @@ class Api::V1::ImagesController < ApplicationController
         end
     end
 
-    # POST /api/v1/create_multiple
+    # POST /api/v1/images/create_multiple
     def create_multiple
         name_format = []
-        params[:images].each do |image|
-            begin
-                s3 = s3_resource
-                bucket = s3.bucket(ENV['AWS_BUCKET_NAME'])
+        begin
+            s3 = s3_resource
+            bucket = s3.bucket(ENV['AWS_BUCKET_NAME'])
+            params[:images].each do |image|
                 object = bucket.object(image.original_filename)
                 object.upload_file(image.tempfile, acl: 'private')
-
                 name_format << {name: image.original_filename.split('.')[0], format: image.original_filename.split('.')[1]}
-            rescue => e
-                render json: { error: e.message }, status: :unprocessable_entity
             end
+            render json: { images: name_format }, status: :created
+        rescue => e
+            render json: { error: e.message }, status: :unprocessable_entity
         end
-        render json: { images: name_format }, status: :created
     end
 
     private

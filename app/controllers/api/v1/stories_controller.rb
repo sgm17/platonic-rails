@@ -25,7 +25,10 @@ class Api::V1::StoriesController < ApplicationController
     # GET /api/v1/stories/:faculty_id
     def show
       faculty = Faculty.find(params[:id])
-      stories = faculty.stories.where('created_at >= ?', 24.hours.ago).includes(user: [:university, :faculty]).map do |story|
+      stories = faculty.stories
+                          .where('created_at >= ?', 24.hours.ago)
+                          .includes(user: [:university, :faculty])
+                          .map do |story|
         story_json = story.as_json(
           except: [:meet_status, :sex_to_meet, :university_to_meet_id, :created_at, :updated_at],
           include: {

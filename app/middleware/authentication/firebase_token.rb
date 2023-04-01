@@ -1,3 +1,4 @@
+require_relative 'expired_error'
 require 'base64'
 require 'httparty'
 require 'jwt'
@@ -60,6 +61,12 @@ class FirebaseToken
       iss: "https://securetoken.google.com/#{ENV['PROJECT_ID']}"
     }
 
-    JWT.decode(@token, public_key, true, options)
+    begin
+      JWT.decode(@token, public_key, true, options)
+    rescue JWT::ExpiredSignature
+      raise ExpiredError.new
+    rescue JWT::DecodeError, JWT::VerificationError
+      raise InvalidTokenError.new
+    end
   end
 end

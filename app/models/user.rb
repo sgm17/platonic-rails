@@ -21,11 +21,14 @@ class User < ApplicationRecord
     # visualizations that the user set to the stories
     has_many :visualizations, dependent: :destroy
 
-    # users has many stories
+    # user has many stories
     has_many :stories, dependent: :destroy
 
-    # users has many stories
+    # user has many flats
     has_many :flats, foreign_key: :owner_id, dependent: :destroy, class_name: 'Flat'
+
+    # user has many transports
+    has_many :transports, dependent: :destroy
 
     # user has many meets
     has_many :meets_as_user1, class_name: "Meet", foreign_key: "user1_id", dependent: :destroy

@@ -74,8 +74,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_13_225041) do
     t.integer "advance_price_in_cents", null: false
     t.integer "electricity_price_in_cents", null: false
     t.datetime "available_from", null: false
-    t.decimal "max_months_stay", null: false
-    t.decimal "min_months_stay", null: false
+    t.string "max_months_stay", null: false
+    t.string "min_months_stay", null: false
     t.string "tenants_number", null: false
     t.string "bedroom", null: false
     t.string "bathroom", null: false
@@ -178,10 +178,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_13_225041) do
     t.string "name", null: false
     t.integer "icon", null: false
     t.integer "minutes", null: false
-    t.bigint "university_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["university_id"], name: "index_transports_on_university_id"
+    t.index ["user_id"], name: "index_transports_on_user_id"
   end
 
   create_table "universities", force: :cascade do |t|
@@ -239,7 +239,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_13_225041) do
   add_foreign_key "stories", "faculties"
   add_foreign_key "stories", "users"
   add_foreign_key "studies", "faculties"
-  add_foreign_key "transports", "universities"
+  add_foreign_key "transports", "users"
   add_foreign_key "users", "faculties"
   add_foreign_key "users", "studies"
   add_foreign_key "users", "universities"

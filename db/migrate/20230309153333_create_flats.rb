@@ -10,8 +10,8 @@ class CreateFlats < ActiveRecord::Migration[7.0]
       t.integer :advance_price_in_cents, null: false
       t.integer :electricity_price_in_cents, null: false
       t.datetime :available_from, null: false
-      t.decimal :max_months_stay, null: false
-      t.decimal :min_months_stay, null: false
+      t.string :max_months_stay, null: false
+      t.string :min_months_stay, null: false
       t.string :tenants_number, null: false
       t.string :bedroom, null: false
       t.string :bathroom, null: false

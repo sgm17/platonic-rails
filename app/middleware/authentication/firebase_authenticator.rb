@@ -1,4 +1,5 @@
 require_relative 'firebase_token'
+require_relative 'expired_error'
 
 class FirebaseAuthenticator
   def initialize(app)
@@ -19,14 +20,15 @@ class FirebaseAuthenticator
         begin
           decoded_token = token.verify()
           env['firebase.user'] = decoded_token
-
+        rescue ExpiredError => e
+          return [403, {'Content-Type' => 'application/json'}, [{error: 'JWT has expired'}.to_json]]
         rescue StandardError => e
-          [401, {'Content-Type' => 'application/json'}, [{error: 'Invalid Firebase ID token'}.to_json]]
+          return [401, {'Content-Type' => 'application/json'}, [{error: 'Unable to verify JWT'}.to_json]]
         end
       end
 
       if env['firebase.user'].nil?
-          [401, {'Content-Type' => 'application/json'}, [{error: 'Authorization header is missing or invalid'}.to_json]]
+          return [401, {'Content-Type' => 'application/json'}, [{error: 'Authorization header is missing or invalid'}.to_json]]
       else
         @app.call(env)
       end

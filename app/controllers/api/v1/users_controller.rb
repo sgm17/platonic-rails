@@ -3,6 +3,11 @@ class Api::V1::UsersController < ApplicationController
 
     # GET /api/v1/users
     def index
+      if @current_user.nil?
+        render json: nil
+        return
+      end
+
       render json: @current_user.as_json(
         except: [:created_at, :updated_at],
         include: {
@@ -101,6 +106,11 @@ class Api::V1::UsersController < ApplicationController
         else
           render json: @current_user.errors, status: :unprocessable_entity
         end
+    end
+
+    # GET /api/v1/users_count
+    def users_count
+      render json: { count: User.all.count }
     end
 
     private
