@@ -141,7 +141,7 @@ class Api::V1::MeetsController < ApplicationController
       return nil
     end
 
-    def send_push_notification(user_id, title, body, type, data)
+    def self.send_push_notification(user_id, title, body, type, data)
       # Retrieve the user's cloud token from the database
       user = User.find(user_id)
       cloud_token = user.cloud_token
