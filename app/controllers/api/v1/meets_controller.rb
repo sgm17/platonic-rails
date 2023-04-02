@@ -104,7 +104,12 @@ class Api::V1::MeetsController < ApplicationController
       users_to_match = users_to_match.order(faculty_id: :desc)
 
       # Exclude users that have already been matched
-      users_to_match = users_to_match.where.not(id: user.meets.pluck(:user2_id))
+      users_to_match = users_to_match.where.not(
+        id: user.meets.select { |meet| 
+          meet.user1_id == user.id && meet.user2_id == other_user.id ||
+          meet.user1_id == other_user.id && meet.user2_id == user.id
+        }.pluck(:user2_id)
+      )
 
       # Check if any user in users_to_match matches all preferences
       perfect_matches = users_to_match.where(
