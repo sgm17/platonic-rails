@@ -219,7 +219,7 @@ class Api::V1::FlatsController < ApplicationController
                 rent_price_per_month_in_cents: @flat.rent_price_per_month_in_cents,
                 electricity_price_in_cents: @flat.electricity_price_in_cents,
                 book_mark: false,
-                transports: @flat.transports.as_json(
+                transport: transport.as_json(
                     include: {
                         user: { 
                             except: [:meet_status, :sex_to_meet, :university_to_meet_id, :faculties_to_meet, :created_at, :updated_at],

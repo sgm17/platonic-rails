@@ -1,3 +1,5 @@
+require_relative '../../../fcm/firebase_cloud_messaging'
+
 class Api::V1::MeetsController < ApplicationController
     before_action :current_user, only: [:index]
   
@@ -137,6 +139,16 @@ class Api::V1::MeetsController < ApplicationController
 
       # No match found
       return nil
+    end
+
+    def send_push_notification(user_id, title, body, type, data)
+      # Retrieve the user's cloud token from the database
+      user = User.find(user_id)
+      cloud_token = user.cloud_token
+
+      # Send the push notification
+      fcm = FirebaseCloudMessaging.new
+      fcm.send_push_notification(cloud_token, title, body, type, data)
     end
   end
   
