@@ -65,8 +65,6 @@ class FirebaseToken
       JWT.decode(@token, public_key, true, options)
     rescue JWT::ExpiredSignature
       raise ExpiredError.new
-    rescue JWT::DecodeError, JWT::VerificationError
-      raise InvalidTokenError.new
     end
   end
 end

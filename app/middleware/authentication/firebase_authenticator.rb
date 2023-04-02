@@ -23,6 +23,7 @@ class FirebaseAuthenticator
         rescue ExpiredError => e
           return [403, {'Content-Type' => 'application/json'}, [{error: 'JWT has expired'}.to_json]]
         rescue StandardError => e
+          puts e
           return [401, {'Content-Type' => 'application/json'}, [{error: 'Unable to verify JWT'}.to_json]]
         end
       end

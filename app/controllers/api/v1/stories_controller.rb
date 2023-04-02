@@ -104,9 +104,7 @@ class Api::V1::StoriesController < ApplicationController
       else
         @story.favourites.create(user_id: @current_user.id)
 
-        data_json = {"faculty_id" => @story.faculty.id.to_s}
-
-        PushNotificationJob.perform_later(@story.user.id, "A #{@current_user.name} le ha gustado tu historia", nil, "favourite", data_json)
+        PushNotificationJob.perform_later(@story.user.id, @current_user.name, "Nuevo like en historia", "favourite", @story.faculty.id.to_s)
         
         render json: { favourite: @story.favourites.exists?(user_id: @current_user.id) }
       end

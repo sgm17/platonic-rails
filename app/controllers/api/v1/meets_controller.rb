@@ -63,8 +63,8 @@ class Api::V1::MeetsController < ApplicationController
           # Remove matched male from males array
           males = males.where.not(id: match.id)
 
-          send_push_notification(female.id, "Tienes un meet nuevo con #{match.name}", nil, "meet", match.as_json.transform_values(&:to_s))
-          send_push_notification(match.id, "Tienes un meet nuevo con #{female.name}", nil, "meet", female.as_json.transform_values(&:to_s))
+          send_push_notification(female.id, match.name, "Nuevo meet", "meet", match.id.to_s)
+          send_push_notification(match.id, female.name, "Nuevo meet", "meet", female.id.to_s)
 
           # Create Meet record
           Meet.create(user1: female, user2: match)
@@ -88,8 +88,8 @@ class Api::V1::MeetsController < ApplicationController
           # Add match to male_matches hash
           male_matches[male.id] = match.id
 
-          send_push_notification(male.id, "Tienes un meet nuevo con #{match.name}", nil, "meet", match.as_json.transform_values(&:to_s))
-          send_push_notification(match.id, "Tienes un meet nuevo con #{male.name}", nil, "meet", male.as_json.transform_values(&:to_s))
+          send_push_notification(male.id, match.name, "Nuevo meet", "meet", match.id.to_s)
+          send_push_notification(match.id, male.name, "Nuevo meet", "meet", male.id.to_s)
 
           Meet.create(user1: male, user2: match)
         end
@@ -146,14 +146,14 @@ class Api::V1::MeetsController < ApplicationController
       return nil
     end
 
-    def self.send_push_notification(user_id, title, body, type, data)
+    def self.send_push_notification(user_id, title, body, type, id)
       # Retrieve the user's cloud token from the database
       user = User.find(user_id)
       cloud_token = user.cloud_token
 
       # Send the push notification
       fcm = FirebaseCloudMessaging.new
-      fcm.send_push_notification(cloud_token, title, body, type, data)
+      fcm.send_push_notification(cloud_token, title, body, type, id)
     end
   end
   

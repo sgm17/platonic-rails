@@ -78,6 +78,7 @@ class Api::V1::FlatsController < ApplicationController
             end
         else
             @flat.tenants << tenant
+            PushNotificationJob.perform_later(tenant.id, @current_user.name, "Nuevo inquilino en el piso", "flat", @flat.id.to_s)
         end
 
         if @flat.update(tenants: @flat.tenants)

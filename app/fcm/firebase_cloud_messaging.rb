@@ -14,7 +14,7 @@ class FirebaseCloudMessaging
 
   end
 
-  def send_push_notification(cloud_token, title, body, type, data)
+  def send_push_notification(cloud_token, title, body, type, id)
     message = Google::Apis::FcmV1::SendMessageRequest.new(
       message: {
         token: cloud_token,
@@ -26,8 +26,9 @@ class FirebaseCloudMessaging
           priority: "high"
         },
         data: {
-          "type": type
-        }.merge(data)
+          "type": type,
+          "id": id
+        }
       }
     )
     response = @fcm.send_message("projects/#{ENV['PROJECT_ID']}", message) do |result, err|
