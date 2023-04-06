@@ -338,11 +338,13 @@ class Api::V1::FlatsController < ApplicationController
     end
 
     def set_flats
-        @flats = Flat.joins(owner: :university)
+        flat_ids = Flat.joins(owner: :university)
                     .joins("LEFT JOIN flats_tenants ON flats_tenants.flat_id = flats.id")
                     .joins("LEFT JOIN users ON users.id = flats_tenants.user_id")
                     .where('users.university_id = ? OR universities.id = ?', @current_user.university_id, @current_user.university_id)
-                    .order(created_at: :desc)
+                    .distinct
+		    .pluck(:id)
+	@flats = Flat.where(id: flat_ids).order(created_at: :desc)
     end
 
     def flat_params
